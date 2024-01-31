@@ -18,7 +18,6 @@ export class UsersService {
   ) {}
 
   //CREAR USUARIO ----------------------------------------------------------------
-  //CREAR USUARIO ----------------------------------------------------------------
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const { password, email } = createUserDto;
 
