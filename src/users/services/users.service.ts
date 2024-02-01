@@ -44,8 +44,8 @@ export class UsersService {
       const savedUser = await this.userRepository.save(newUser);
       console.log('Guardado exitoso. Retornando el nuevo usuario.');
 
-      // No retornar la contraseña en la respuesta
-      const { password: _, ...userWithoutPassword } = savedUser; // eslint-disable-line no-unused-vars
+      // eslint-disable-line no-unused-vars
+      const { password: _, ...userWithoutPassword } = savedUser;
       return userWithoutPassword as UserEntity;
     } catch (error) {
       // Manejar errores de base de datos
