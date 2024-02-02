@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSourceConfig } from './config/data.source';
 import { EsquelaModule } from './esquela/esquela.module';
+import { PedidoModule } from './pedido/pedido.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { EsquelaModule } from './esquela/esquela.module';
     TypeOrmModule.forRoot(DataSourceConfig),
     UsersModule,
     EsquelaModule,
+    PedidoModule,
   ],
   controllers: [],
   providers: [],
