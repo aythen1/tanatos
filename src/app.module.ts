@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSourceConfig } from './config/data.source';
 import { EsquelaModule } from './esquela/esquela.module';
 import { PedidoModule } from './pedido/pedido.module';
+import { FloristeriaModule } from './floristeria/floristeria.module';
+import { TanatorioModule } from './tanatorio/tanatorio.module';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { PedidoModule } from './pedido/pedido.module';
     UsersModule,
     EsquelaModule,
     PedidoModule,
+    FloristeriaModule,
+    TanatorioModule,
   ],
   controllers: [],
   providers: [],

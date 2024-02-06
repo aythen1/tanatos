@@ -68,7 +68,7 @@ export class UpdatePedidoDto {
   direccion?: string;
 
   @IsOptional()
-  @IsIn(['en proceso', 'cancelado', 'listo', 'finalizado'])
+  @IsIn(['solicitado', 'cancelado', 'listo', 'finalizado'])
   state?: string;
 
   @IsOptional()
