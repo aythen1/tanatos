@@ -53,6 +53,11 @@ export class UsersService {
       throw new InternalServerErrorException('Falla al crear usuario.');
     }
   }
+  //BUSCAR POR EMAIL AL USUARIO ----------------------------------------------------------------
+  async findByEmail(email: string): Promise<UserEntity | undefined> {
+    console.log(`Buscando usuario por email: ${email}`);
+    return this.userRepository.findOne({ where: { email } });
+  }
 
   //BUSCAR TODOS LOS USUARIOS --------------------------------------------------------
   async findAll(): Promise<UserEntity[]> {

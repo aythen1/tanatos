@@ -8,10 +8,12 @@ import {
   Delete,
   HttpStatus,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Controller('users')
 export class UsersController {
@@ -108,6 +110,64 @@ export class UsersController {
     }
   }
 
+  @Post('login')
+  async login(@Body() credentials: { email: string; password: string }) {
+    const { email, password } = credentials;
+
+    try {
+      // Verificar si el usuario existe
+      console.log(`Buscando usuario con email: ${email}...`);
+      const user = await this.usersService.findByEmail(email);
+      if (!user) {
+        console.log(`El usuario con email ${email} no fue encontrado.`);
+        throw new NotFoundException('User not found');
+      }
+
+      // Verificar si la contraseña es correcta
+      console.log(
+        `Verificando contraseña para el usuario con email: ${email}...`,
+      );
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        console.log(
+          `Contraseña incorrecta para el usuario con email: ${email}.`,
+        );
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      console.log(
+        `Inicio de sesión exitoso para el usuario con email: ${email}.`,
+      );
+      // Devolver solo los datos necesarios del usuario
+      const { id, username, email: userEmail } = user;
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Login successful',
+        data: {
+          id,
+          username,
+          email: userEmail,
+        },
+      };
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof UnauthorizedException
+      ) {
+        return {
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Invalid credentials',
+        };
+      } else {
+        return {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+        };
+      }
+    }
+  }
+
   // Método para eliminar un usuario por ID
   @Delete(':id')
   remove(@Param('id') id: string) {
@@ -123,6 +183,34 @@ export class UsersController {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
       };
+    }
+  }
+
+  // Ruta para verificar la existencia de un correo electrónico en la base de datos
+  @Get('check-email/:email')
+  async checkEmailExists(@Param('email') email: string) {
+    try {
+      // Buscar el usuario por correo electrónico
+      console.log(`Buscando usuario con email: ${email}...`);
+      const user = await this.usersService.findByEmail(email);
+
+      // Si se encuentra el usuario, devolver un estado 200
+      if (user) {
+        console.log(`El usuario con email ${email} fue encontrado.`);
+        return {
+          statusCode: HttpStatus.OK,
+          message: 'Email found in database',
+        };
+      } else {
+        console.log(`El usuario con email ${email} no fue encontrado.`);
+        return {
+          statusCode: 404,
+          message: 'Email not found in database',
+        };
+      }
+    } catch (error) {
+      console.error('Error al buscar usuario por email:', error);
+      throw new NotFoundException('Email not found in database');
     }
   }
 }
