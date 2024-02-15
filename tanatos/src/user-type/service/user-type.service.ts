@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../entities/user-type.entity';
@@ -62,15 +62,18 @@ export class UsuarioService {
     }
   }
 
-  async update(
-    id: number,
-    updateUsuarioDto: UpdateUsuarioDto,
-  ): Promise<Usuario> {
+  async update(id: number, usuario: Usuario): Promise<Usuario> {
     console.log(`Actualizando usuario con ID ${id}...`);
     try {
-      const usuario = await this.findOne(id);
-      this.usuarioRepository.merge(usuario, updateUsuarioDto);
-      return await this.usuarioRepository.save(usuario);
+      const usuarioExistente = await this.findOne(id);
+      if (!usuarioExistente) {
+        throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+      }
+      const usuarioActualizado = await this.usuarioRepository.save({
+        ...usuarioExistente,
+        ...usuario,
+      });
+      return usuarioActualizado;
     } catch (error) {
       console.error(`Error al actualizar usuario: ${error.message}`);
       throw error;

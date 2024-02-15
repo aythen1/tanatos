@@ -1,3 +1,5 @@
+// update-usuario.dto.ts
+
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUsuarioDto } from './create-user-type.dto';
 import { IsString, MaxLength, IsOptional } from 'class-validator';
@@ -20,6 +22,16 @@ export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   @MaxLength(20, { message: 'Phone should be at most 20 characters long' })
   phone: string;
 
+  @IsString({ message: 'Phone number should be a string' })
+  @MaxLength(20, {
+    message: 'Phone number should be at most 20 characters long',
+  })
+  phoneNumber: string; // Nuevo campo para el número de teléfono
+
+  @IsString({ message: 'Token should be a string' })
+  @MaxLength(20, { message: 'Token should be at most 20 characters long' })
+  token: string; // Nuevo campo para el token de validación
+
   @IsString({ message: 'City should be a string' })
   @MaxLength(25, { message: 'City should be at most 25 characters long' })
   @IsOptional()
@@ -34,7 +46,8 @@ export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {
   dob?: string;
   photo?: string; // Agregar photo como propiedad opcional
 
-  oldPassword?: string;
-  newPassword?: string;
+  @IsOptional()
+  old_password?: string;
+
   stores?: StoreFloristCreateDto[];
 }

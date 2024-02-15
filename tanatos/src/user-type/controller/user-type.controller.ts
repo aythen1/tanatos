@@ -36,13 +36,22 @@ export class UsuarioController {
   async findOne(@Param('id') id: string) {
     return this.usuarioService.findOne(id);
   }
-
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUsuarioDto: UpdateUsuarioDto,
   ) {
-    return this.usuarioService.update(id, updateUsuarioDto);
+    // Obtener el usuario de la base de datos
+    const usuario = await this.usuarioService.findOne(id);
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
+
+    // Fusionar las propiedades del DTO con el objeto Usuario
+    Object.assign(usuario, updateUsuarioDto);
+
+    // Llamar al método update del servicio con el objeto Usuario
+    return this.usuarioService.update(id, usuario);
   }
 
   @Delete(':id')
@@ -126,23 +135,40 @@ export class UsuarioController {
   @Patch(':id/update-password')
   async updatePassword(
     @Param('id', ParseIntPipe) id: number,
-    @Body('newPassword') newPassword: string,
+    @Body('newPassword') new_password: string,
+    @Body('oldPassword') old_password: string,
   ): Promise<any> {
     try {
-      // Encriptar la nueva contraseña antes de guardarla en la base de datos
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      // Obtener el usuario por su ID
+      const user = await this.usuarioService.findOne(id);
+      if (!user) {
+        throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+      }
 
-      // Actualizar la contraseña en la base de datos
-      const updatedUser = await this.usuarioService.updatePassword(
-        id,
-        hashedPassword,
+      // Verificar si la contraseña antigua coincide
+      const isOldPasswordValid = await bcrypt.compare(
+        old_password,
+        user.password,
       );
+      if (!isOldPasswordValid) {
+        throw new BadRequestException('La contraseña antigua es incorrecta');
+      }
+
+      // Encriptar la nueva contraseña antes de guardarla en la base de datos
+      const hashedNewPassword = await bcrypt.hash(new_password, 10);
+
+      // Actualizar la contraseña y la contraseña anterior en la base de datos
+      user.old_password = old_password; // Guardar la contraseña antigua como old_password
+      user.password = hashedNewPassword; // Guardar la nueva contraseña
+
+      // Guardar los cambios en la base de datos
+      await this.usuarioService.update(id, user);
 
       // Devolver la respuesta con la contraseña actualizada
       return {
         statusCode: HttpStatus.OK,
         message: 'Contraseña actualizada correctamente',
-        data: updatedUser,
+        data: user, // Se puede devolver el usuario actualizado si es necesario
       };
     } catch (error) {
       console.error('Error al actualizar la contraseña:', error);

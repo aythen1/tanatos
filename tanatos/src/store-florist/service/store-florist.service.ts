@@ -17,6 +17,10 @@ export class StoreFloristService {
   async create(
     createStoreFloristDTO: CreateStoreFloristDto,
     userId: number,
+    name: string, // Agrega la propiedad name recibida del front-end
+    location: string, // Agrega la propiedad location recibida del front-end
+    lat: number,
+    lng: number,
   ): Promise<StoreFlorist> {
     const user = await this.usuarioRepository.findOne({
       where: { id: userId },
@@ -28,11 +32,11 @@ export class StoreFloristService {
     }
 
     const storeFlorist = new StoreFlorist();
-    storeFlorist.phone = createStoreFloristDTO.phone;
-    storeFlorist.location = createStoreFloristDTO.location;
-    storeFlorist.lat = createStoreFloristDTO.lat;
-    storeFlorist.lng = createStoreFloristDTO.lng;
-    storeFlorist.name = createStoreFloristDTO.name;
+    storeFlorist.phone = user.phone;
+    storeFlorist.location = location;
+    storeFlorist.lat = lat;
+    storeFlorist.lng = lng;
+    storeFlorist.name = name; // Utiliza la propiedad name recibida del front-end
     storeFlorist.usuario = user;
 
     return await this.storeFloristRepository.save(storeFlorist);

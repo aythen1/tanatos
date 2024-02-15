@@ -6,7 +6,7 @@ import {
   Param,
   Delete,
   Query,
-  NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { StoreFloristService } from '../service/store-florist.service';
 import { CreateStoreFloristDto } from '../dto/create-store-florist.dto';
@@ -18,19 +18,21 @@ export class StoreFloristController {
   @Post(':userId')
   async create(
     @Body() createStoreFloristDto: CreateStoreFloristDto,
-    @Param('userId') userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body('name') name: string, // Agrega la propiedad name recibida del front-end
+    @Body('location') location: string, // Agrega la propiedad location recibida del front-end
+    @Body('lng') lng: number, // Agrega la propiedad name recibida del front-end
+    @Body('lat') lat: number, // Agrega la propiedad location recibida del front-end
   ) {
-    try {
-      const createdStoreFlorist = await this.storeFloristService.create(
-        createStoreFloristDto,
-        userId,
-      );
-      return { success: true, data: createdStoreFlorist };
-    } catch (error) {
-      throw new NotFoundException(error.message);
-    }
+    return this.storeFloristService.create(
+      createStoreFloristDto,
+      userId,
+      name,
+      location,
+      lng,
+      lat,
+    );
   }
-
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return await this.storeFloristService.delete(id);

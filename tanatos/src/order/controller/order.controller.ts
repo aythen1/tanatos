@@ -15,11 +15,20 @@ import { UpdateOrderDto } from '../dto/update-order.dto';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  @Post(':store_id/:esquela_id/:client_id')
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @Param('store_id') store_id: number,
+    @Param('esquela_id') esquela_id: number,
+    @Param('client_id') client_id: number,
+  ) {
+    return this.orderService.create(
+      createOrderDto,
+      store_id,
+      esquela_id,
+      client_id,
+    );
   }
-
   @Get()
   async findAll() {
     return this.orderService.findAll();
@@ -46,5 +55,14 @@ export class OrderController {
   @Get('status/:status')
   async findByStatus(@Param('status') status: string) {
     return this.orderService.findByStatus(status);
+  }
+
+  @Get(':storeId/orders/:status') // Ruta para obtener todos los pedidos asociados al ID de la tienda florista
+  async findOrdersByStoreId(
+    @Param('storeId') storeId: number,
+    @Param('status') status: string,
+  ) {
+    // Llama al método correspondiente en el servicio OrderService para obtener los pedidos
+    return await this.orderService.findOrdersByStoreId(storeId, status);
   }
 }

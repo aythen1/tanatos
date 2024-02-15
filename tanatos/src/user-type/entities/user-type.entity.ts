@@ -49,9 +49,18 @@ export class Usuario {
   @Column()
   user_type: string;
 
+  @Column({ nullable: true })
+  old_password: string | null; // Guarda la contraseña anterior si ha sido modificada
+
   @OneToMany(() => StoreFlorist, (store) => store.id, { nullable: true })
   store: StoreFlorist[];
 
   @OneToMany(() => Funeral, (funeral) => funeral.id, { nullable: true })
   esquela: Funeral[];
+
+  @Column({ nullable: true })
+  verificationCode: string; // Propiedad para almacenar el código de verificación
+
+  @Column({ nullable: true })
+  verificationCodeExpiration: Date; // Propiedad para almacenar la fecha de expiración del código de verificación
 }

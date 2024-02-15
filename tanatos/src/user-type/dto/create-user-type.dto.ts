@@ -1,3 +1,5 @@
+// create-usuario.dto.ts
+
 import {
   IsEmail,
   IsNotEmpty,
@@ -46,6 +48,14 @@ export class CreateUsuarioDto {
   @IsString()
   phone: string;
 
+  @IsNotEmpty()
+  @IsString()
+  phoneNumber: string; // Nuevo campo para el número de teléfono
+
+  @IsNotEmpty()
+  @IsString()
+  token: string; // Nuevo campo para el token de validación
+
   lat: number;
 
   lng: number;
@@ -61,6 +71,9 @@ export class CreateUsuarioDto {
   @IsNotEmpty()
   @IsString()
   user_type: string;
+
+  @IsOptional()
+  old_password?: string;
 
   @IsOptional()
   stores?: StoreFloristCreateDto[];

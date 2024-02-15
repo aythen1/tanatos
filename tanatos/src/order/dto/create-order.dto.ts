@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   IsEnum,
+  IsNumber,
 } from 'class-validator';
 import { OrderStatus } from './order-status.enum';
 
@@ -40,4 +41,16 @@ export class CreateOrderDto {
   @IsOptional()
   @IsEnum(OrderStatus)
   readonly status?: OrderStatus;
+
+  @IsNotEmpty()
+  @IsNumber()
+  cliente_id: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  store_id: number;
+
+  @IsOptional()
+  @IsNumber()
+  esquela_id: number;
 }
